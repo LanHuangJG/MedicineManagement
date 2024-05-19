@@ -1,0 +1,29 @@
+body,html,#app{
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    height: 100%;
+    width: 100%;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.1s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+::-webkit-scrollbar-track {
+    border-radius: 16px;
+    background-color: #e7e7e7;
+    border: 1px solid #cacaca;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 16px;
+    background-color: #b4b4b4;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
