@@ -1,3 +1,3 @@
 # 这是一个药品管理系统
 
-## **我爱springboot😄 **
+## **我爱springboot😄**
