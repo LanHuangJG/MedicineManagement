@@ -42,6 +42,7 @@ const counting = ref(false)
 const onCountdownEnd = () => {
   counting.value = false
 }
+
 function sendEmail() {
   if (form.username === "") {
     ElNotification({
@@ -89,7 +90,9 @@ const router = useRouter()
       </mdui-text-field>
       <div style="margin: 16px"/>
       <mdui-button :disabled="counting" full-width @click="sendEmail">
-        <vue-countdown v-if="counting" v-slot="{ totalSeconds }" :time="60000" @end="onCountdownEnd">请在{{totalSeconds }}s 后重试
+        <vue-countdown v-if="counting" v-slot="{ totalSeconds }" :time="60000" @end="onCountdownEnd">请在{{
+            totalSeconds
+          }}s 后重试
         </vue-countdown>
         <span v-else>获取验证码</span>
       </mdui-button>

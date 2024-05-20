@@ -75,7 +75,9 @@ const bigTypeIcon = computed(() => {
 const typeIcon = computed(() => {
   return route.path === "/type" ? "dataset--two-tone" : "dataset--outlined"
 })
-
+const mockIcon = computed(() => {
+  return route.path === "/mock" ? "add_shopping_cart--two-tone" : "add_shopping_cart--outlined"
+})
 function showUserInfoDialog() {
   dialog({
     headline: "用户信息",
@@ -128,6 +130,9 @@ function showUserInfoDialog() {
       </mdui-navigation-rail-item>
       <mdui-navigation-rail-item :icon="saleIcon" value="/sale" @click="router.replace('/sale')">
         销售记录
+      </mdui-navigation-rail-item>
+      <mdui-navigation-rail-item :icon="mockIcon" value="/mock" @click="router.replace('/mock')">
+        模拟购买
       </mdui-navigation-rail-item>
     </mdui-navigation-rail>
     <mdui-layout-main>

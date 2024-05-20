@@ -94,9 +94,50 @@ class MedicineController {
         )
     }
 
+    data class AddMedicineRequest(
+        var name: String? = null,
+        var type: String? = null,
+        var bigType: String? = null,
+        var image: String? = null,
+        var indications: String? = null,
+        var mainIngredient: String? = null,
+        var functionalIndications: String? = null,
+        var dosage: String? = null,
+        var approvalNumber: String? = null,
+        var manufacturer: String? = null,
+    )
+
+    data class AddMedicineResponse(
+        val code: String,
+        val message: String
+    )
+
     @PostMapping("/addMedicine")
-    fun addMedicine(@RequestBody medicine: Medicine) {
-        insert(medicine)
+    fun addMedicine(@RequestBody addMedicineRequest: AddMedicineRequest): AddMedicineResponse {
+        if (addMedicineRequest.type == null || addMedicineRequest.bigType == null) {
+            return AddMedicineResponse("400", "参数错误")
+        }
+        val type = filterOne<MedicineType> {
+            MedicineType::name eq addMedicineRequest.type
+        }
+        val bigType = filterOne<MedicineBigType> {
+            MedicineBigType::name eq addMedicineRequest.bigType
+        }
+        insert(
+            Medicine(
+                name = addMedicineRequest.name,
+                tid = type?.id,
+                bid = bigType?.id,
+                image = addMedicineRequest.image,
+                indications = addMedicineRequest.indications,
+                mainIngredient = addMedicineRequest.mainIngredient,
+                functionalIndications = addMedicineRequest.functionalIndications,
+                dosage = addMedicineRequest.dosage,
+                approvalNumber = addMedicineRequest.approvalNumber,
+                manufacturer = addMedicineRequest.manufacturer
+            )
+        )
+        return AddMedicineResponse("200", "添加成功")
     }
 
     data class UpdateMedicineRequest(
@@ -145,5 +186,19 @@ class MedicineController {
             )
         )
         return UpdateMedicineResponse("200", "更新成功")
+    }
+
+    data class DeleteMedicineResponse(
+        val code: String,
+        val message: String
+    )
+    data class DeleteMedicineRequest(
+        val id: Long
+    )
+    @PostMapping("/deleteMedicine")
+    fun deleteMedicine(@RequestBody deleteMedicineRequest: DeleteMedicineRequest): DeleteMedicineResponse {
+        if (deleteMedicineRequest.id < 2276) return DeleteMedicineResponse("400", "删除失败,保留药品不能被删除")
+        medicineMapper.deleteById(deleteMedicineRequest.id)
+        return DeleteMedicineResponse("200", "删除成功")
     }
 }

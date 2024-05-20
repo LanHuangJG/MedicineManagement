@@ -178,12 +178,54 @@ const updateMedicine = () => {
 const addMedicine = () => {
   const token =
       useStorage('token', "")
-  console.log(form)
-  console.log(type.value)
-  console.log(bigType.value)
+  axios.post("/api/medicine/addMedicine", {
+    name: addMedicineForm.name,
+    image: addMedicineForm.image,
+    indications: addMedicineForm.indications,
+    mainIngredient: addMedicineForm.mainIngredient,
+    functionalIndications: addMedicineForm.functionalIndications,
+    dosage: addMedicineForm.dosage,
+    approvalNumber: addMedicineForm.approvalNumber,
+    manufacturer: addMedicineForm.manufacturer,
+    type: type.value,
+    bigType: bigType.value
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      getMedicineList(currentPage.value)
+    }
+  })
   ElMessage({
     message: '添加成功',
     type: 'success',
+  })
+}
+const currentDeleteMedicineId = ref(0)
+
+const deleteMedicine = () => {
+  const token = useStorage('token', "")
+  axios.post("/api/medicine/deleteMedicine", {
+    id: currentDeleteMedicineId.value
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      getMedicineList(currentPage.value)
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+      });
+    }else{
+      ElMessage({
+        message: res.data.message,
+        type: 'error',
+      });
+    }
   })
 }
 </script>
@@ -388,6 +430,8 @@ const addMedicine = () => {
         </div>
       </template>
     </el-dialog>
+
+    <!--    删除药品    -->
     <el-dialog
         v-model="dialogDeleteVisible"
         align-center
@@ -398,10 +442,7 @@ const addMedicine = () => {
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogDeleteVisible = false">取消</el-button>
-          <el-button type="danger" @click="dialogDeleteVisible = false; ElMessage({
-    message: '删除成功',
-    type: 'success',
-  })">
+          <el-button type="danger" @click="dialogDeleteVisible = false;deleteMedicine()">
             确定
           </el-button>
         </div>
@@ -431,6 +472,7 @@ const addMedicine = () => {
 
 
       <el-table :data="medicines" border height="550" stripe style="width: 100%">
+        <el-table-column label="id" prop="id" width="60"/>
         <el-table-column label="药品图" prop="image" width="100">
           <template v-slot="scope">
             <el-image :src="scope.row.image" fit="cover" loading="lazy"/>
@@ -482,7 +524,9 @@ const addMedicine = () => {
 bigType=scope.row.bigType.name;type=scope.row.type.name">
                 编辑
               </el-button>
-              <el-button :icon="Delete" type="danger" @click="dialogDeleteVisible = true">删除</el-button>
+              <el-button :icon="Delete" type="danger"
+                         @click="dialogDeleteVisible = true;currentDeleteMedicineId=scope.row.id">删除
+              </el-button>
             </div>
           </template>
         </el-table-column>

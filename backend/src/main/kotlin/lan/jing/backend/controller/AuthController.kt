@@ -145,9 +145,9 @@ class AuthController {
     }
 
     data class InfoResponse(
-        val username: String,
-        val email: String,
-        val code: String
+        val username: String?,
+        val email: String?,
+        val code: String?
     )
 
     @GetMapping("/info")

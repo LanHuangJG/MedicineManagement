@@ -22,7 +22,7 @@
         </div>
       </mdui-card>
       <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"  @click="router.replace('/bigType')">
-        <mdui-icon name='medical_information--two-tone' style="margin: 16px"></mdui-icon>
+        <mdui-icon name='medication_liquid--two-tone' style="margin: 16px"></mdui-icon>
         <div style="display: flex;justify-items: center;align-items: center;justify-content: space-between">
           <div class="mdui-prose" style="margin-left: 16px">
             <h2>药品分类</h2>
