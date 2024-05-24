@@ -8,7 +8,7 @@ import com.mybatisflex.annotation.Table
 data class User(
     @Id(keyType = KeyType.Auto)
     var id: Long? = null,
-    var username: String,
-    var password: String,
-    var email: String,
+    var username: String?=null,
+    var password: String?=null,
+    var email: String?=null,
 )

@@ -1,9 +1,6 @@
 package lan.jing.backend.entity
 
-import com.mybatisflex.annotation.Id
-import com.mybatisflex.annotation.KeyType
-import com.mybatisflex.annotation.RelationOneToOne
-import com.mybatisflex.annotation.Table
+import com.mybatisflex.annotation.*
 
 @Table("medicine")
 data class Medicine(
@@ -22,5 +19,7 @@ data class Medicine(
     @RelationOneToOne(selfField = "tid", targetField = "id")
     var type: MedicineTypeWithMedicines? = null,
     @RelationOneToOne(selfField = "bid", targetField = "id")
-    var bigType: MedicineBigTypeWithoutTypes? = null
+    var bigType: MedicineBigTypeWithoutTypes? = null,
+    @Column(isLogicDelete = true)
+    var isDelete: Boolean = false
 )

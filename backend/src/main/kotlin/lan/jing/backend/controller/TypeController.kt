@@ -2,6 +2,7 @@ package lan.jing.backend.controller
 
 import com.mybatisflex.core.query.QueryWrapper
 import com.mybatisflex.kotlin.extensions.db.all
+import com.mybatisflex.kotlin.extensions.db.insert
 import com.mybatisflex.kotlin.extensions.kproperty.eq
 import lan.jing.backend.entity.MedicineBigType
 import lan.jing.backend.entity.MedicineBigTypeWithoutTypes
@@ -10,10 +11,7 @@ import lan.jing.backend.mapper.BigTypeMapper
 import lan.jing.backend.mapper.MedicineBigTypeWithoutMedicinesMapper
 import lan.jing.backend.mapper.TypeMapper
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/type")
@@ -86,6 +84,19 @@ class TypeController {
             "code" to "200",
             "message" to "获取药品种类成功",
             "types" to bigType.types,
+        )
+    }
+
+    data class AddBigTypeRequest(
+        val name: String
+    )
+
+    @PostMapping
+    fun addBigType(@RequestBody addBigTypeRequest: AddBigTypeRequest) {
+        insert(
+            MedicineBigType(
+                name = addBigTypeRequest.name
+            )
         )
     }
 }

@@ -3,13 +3,14 @@ import {onMounted, reactive, ref, watch} from "vue";
 import {useStorage} from "@vueuse/core";
 import axios from "axios";
 import {ElMessage} from "element-plus";
-import {Delete, Edit} from "@element-plus/icons-vue";
+import {Delete, Edit,Search} from "@element-plus/icons-vue";
 
 onMounted(() => {
   const token =
       useStorage('token', "")
   getMedicineList(1, 10)
-  axios.get("/api/type//listBigTypeWithoutTypes", {
+  // search()
+  axios.get("/api/type/listBigTypeWithoutTypes", {
     headers: {
       "Authorization": token.value
     }
@@ -49,44 +50,13 @@ const totalPage = ref(1)
 const currentPage = ref(1)
 const bigTypes = ref<BigType[]>([])
 
-function getMedicineList(page: number, size: number = 10) {
-  const token =
-      useStorage('token', "")
-  axios.get(`/api/medicine/list?page=${page}&size=${size}`, {
-    headers: {
-      "Authorization": token.value
-    }
-  }).then(res => {
-    medicines.value = res.data.list.map((item: medicine) => {
-      return {
-        id: item.id,
-        name: item.name,
-        tid: item.tid,
-        bid: item.bid,
-        image: item.image,
-        indications: item.indications,
-        mainIngredient: item.mainIngredient.replace("                           ", ""),
-        functionalIndications: item.functionalIndications.replace("                           ", ""),
-        dosage: item.dosage,
-        approvalNumber: item.approvalNumber,
-        manufacturer: item.manufacturer,
-        type: {
-          id: item.type.id,
-          name: item.type.name
-        },
-        bigType: {
-          id: item.bigType.id,
-          name: item.bigType.name
-        }
-      }
-    })
-
-    totalPage.value = Number(res.data.totalSize)
-  })
-}
 
 const handleCurrentChange = (page: number) => {
-  getMedicineList(page)
+  if (isSearchMode.value) {
+    search(page)
+  } else {
+    getMedicineList(page)
+  }
 }
 
 const refresh = () => {
@@ -178,12 +148,133 @@ const updateMedicine = () => {
 const addMedicine = () => {
   const token =
       useStorage('token', "")
-  console.log(form)
-  console.log(type.value)
-  console.log(bigType.value)
+  axios.post("/api/medicine/addMedicine", {
+    name: addMedicineForm.name,
+    image: addMedicineForm.image,
+    indications: addMedicineForm.indications,
+    mainIngredient: addMedicineForm.mainIngredient,
+    functionalIndications: addMedicineForm.functionalIndications,
+    dosage: addMedicineForm.dosage,
+    approvalNumber: addMedicineForm.approvalNumber,
+    manufacturer: addMedicineForm.manufacturer,
+    type: type.value,
+    bigType: bigType.value
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      getMedicineList(currentPage.value)
+    }
+  })
   ElMessage({
     message: '添加成功',
     type: 'success',
+  })
+}
+const currentDeleteMedicineId = ref(0)
+
+const deleteMedicine = () => {
+  const token = useStorage('token', "")
+  axios.post("/api/medicine/deleteMedicine", {
+    id: currentDeleteMedicineId.value
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      getMedicineList(currentPage.value)
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+      });
+    } else {
+      ElMessage({
+        message: res.data.message,
+        type: 'error',
+      });
+    }
+  })
+}
+const isSearchMode = ref(false)
+const searchWord = ref('')
+const search = (page: number = 1) => {
+  const token = useStorage('token', "")
+  isSearchMode.value = true
+  axios.get(`/api/medicine/searchMedicine?keyword=${searchWord.value}&page=${page}&size=10`, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      ElMessage({
+        message: '搜索成功',
+        type: 'success',
+      });
+      medicines.value = res.data.list.map((item: medicine) => {
+        return {
+          id: item.id,
+          name: item.name,
+          tid: item.tid,
+          bid: item.bid,
+          image: item.image,
+          indications: item.indications,
+          mainIngredient: item.mainIngredient.replace("                           ", ""),
+          functionalIndications: item.functionalIndications.replace("                           ", ""),
+          dosage: item.dosage,
+          approvalNumber: item.approvalNumber,
+          manufacturer: item.manufacturer,
+          type: {
+            id: item.type.id,
+            name: item.type.name
+          },
+          bigType: {
+            id: item.bigType.id,
+            name: item.bigType.name
+          }
+        }
+      })
+      totalPage.value = Number(res.data.totalSize)
+    }
+  })
+}
+
+function getMedicineList(page: number, size: number = 10) {
+  const token =
+      useStorage('token', "")
+  isSearchMode.value = false
+  axios.get(`/api/medicine/list?page=${page}&size=${size}`, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    medicines.value = res.data.list.map((item: medicine) => {
+      return {
+        id: item.id,
+        name: item.name,
+        tid: item.tid,
+        bid: item.bid,
+        image: item.image,
+        indications: item.indications,
+        mainIngredient: item.mainIngredient.replace("                           ", ""),
+        functionalIndications: item.functionalIndications.replace("                           ", ""),
+        dosage: item.dosage,
+        approvalNumber: item.approvalNumber,
+        manufacturer: item.manufacturer,
+        type: {
+          id: item.type.id,
+          name: item.type.name
+        },
+        bigType: {
+          id: item.bigType.id,
+          name: item.bigType.name
+        }
+      }
+    })
+
+    totalPage.value = Number(res.data.totalSize)
   })
 }
 </script>
@@ -388,6 +479,8 @@ const addMedicine = () => {
         </div>
       </template>
     </el-dialog>
+
+    <!--    删除药品    -->
     <el-dialog
         v-model="dialogDeleteVisible"
         align-center
@@ -398,10 +491,7 @@ const addMedicine = () => {
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogDeleteVisible = false">取消</el-button>
-          <el-button type="danger" @click="dialogDeleteVisible = false; ElMessage({
-    message: '删除成功',
-    type: 'success',
-  })">
+          <el-button type="danger" @click="dialogDeleteVisible = false;deleteMedicine()">
             确定
           </el-button>
         </div>
@@ -418,10 +508,11 @@ const addMedicine = () => {
           </h2>
         </div>
         <div style="flex: 1"/>
-        <mdui-button icon="add" style="margin-right: 16px;margin-bottom: 16px" variant="filled"
+        <mdui-button icon="add--two-tone" style="margin-right: 16px;margin-bottom: 16px" variant="filled"
                      @click="type='';bigType='';dialogAddVisible=true">添加药品
         </mdui-button>
-        <mdui-button icon="refresh" style="margin-right: 8px;margin-bottom: 16px" variant="tonal" @click="refresh()">
+        <mdui-button icon="refresh--two-tone" style="margin-right: 8px;margin-bottom: 16px" variant="tonal"
+                     @click="refresh()">
           刷新
         </mdui-button>
       </div>
@@ -431,6 +522,7 @@ const addMedicine = () => {
 
 
       <el-table :data="medicines" border height="550" stripe style="width: 100%">
+        <el-table-column label="id" prop="id" width="60"/>
         <el-table-column label="药品图" prop="image" width="100">
           <template v-slot="scope">
             <el-image :src="scope.row.image" fit="cover" loading="lazy"/>
@@ -482,7 +574,9 @@ const addMedicine = () => {
 bigType=scope.row.bigType.name;type=scope.row.type.name">
                 编辑
               </el-button>
-              <el-button :icon="Delete" type="danger" @click="dialogDeleteVisible = true">删除</el-button>
+              <el-button :icon="Delete" type="danger"
+                         @click="dialogDeleteVisible = true;currentDeleteMedicineId=scope.row.id">删除
+              </el-button>
             </div>
           </template>
         </el-table-column>
@@ -501,6 +595,16 @@ bigType=scope.row.bigType.name;type=scope.row.type.name">
         </svg>
       </div>
       <div style="width: 100%;display: flex;justify-content: center">
+        <div>
+          <el-input v-model="searchWord" placeholder="请输入您要搜索的药品"
+                    style="width: 240px;height: 36px;margin: 16px">
+            <template #prefix>
+              <el-icon class="el-input__icon"><Search /></el-icon>
+            </template>
+          </el-input>
+          <el-button type="success" plain @click="search()">搜索</el-button>
+          <el-button type="primary" plain @click="currentPage=1;refresh()">重置</el-button>
+        </div>
         <div style="flex: 1"/>
 
 

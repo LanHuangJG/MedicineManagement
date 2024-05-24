@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
         }
             , {
                 path: "/sale",
-                component: () => import("../pages/main/SalePage.vue")
+                component: () => import("../pages/main/PurchasePage.vue")
             }
             , {
                 path: "/bigType",
@@ -28,6 +28,10 @@ const routes: RouteRecordRaw[] = [
             , {
                 path: "/type",
                 component: () => import("../pages/main/TypePage.vue")
+            }
+            , {
+                path: "/mock",
+                component: () => import("../pages/main/MockPurchasePage.vue")
             }
         ]
     },
