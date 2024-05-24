@@ -76,7 +76,7 @@ const typeIcon = computed(() => {
   return route.path === "/type" ? "dataset--two-tone" : "dataset--outlined"
 })
 const mockIcon = computed(() => {
-  return route.path === "/mock" ? "add_shopping_cart--two-tone" : "add_shopping_cart--outlined"
+  return route.path === "/mock" ? "spa--two-tone" : "spa--outlined"
 })
 function showUserInfoDialog() {
   dialog({
@@ -95,7 +95,7 @@ function showUserInfoDialog() {
 <template>
   <mdui-layout full-height>
     <mdui-top-app-bar>
-      <mdui-button-icon icon="medical_services--two-tone"></mdui-button-icon>
+      <mdui-button-icon icon="medical_services--two-tone" style="margin-left: 12px"></mdui-button-icon>
       <mdui-top-app-bar-title>
         药品管理系统
       </mdui-top-app-bar-title>
@@ -113,6 +113,7 @@ function showUserInfoDialog() {
       </mdui-dropdown>
     </mdui-top-app-bar>
     <mdui-navigation-rail :value="route.path">
+      <mdui-button-icon icon="settings--two-tone" slot="bottom"></mdui-button-icon>
       <mdui-navigation-rail-item :icon="homeIcon" value="/" @click="router.replace('/')">主页
       </mdui-navigation-rail-item>
       <mdui-navigation-rail-item :icon="medicineManageIcon" value="/medicineManage"
@@ -131,9 +132,9 @@ function showUserInfoDialog() {
       <mdui-navigation-rail-item :icon="saleIcon" value="/sale" @click="router.replace('/sale')">
         销售记录
       </mdui-navigation-rail-item>
-      <mdui-navigation-rail-item :icon="mockIcon" value="/mock" @click="router.replace('/mock')">
+<!--      <mdui-navigation-rail-item :icon="mockIcon" value="/mock" @click="router.replace('/mock')">
         模拟购买
-      </mdui-navigation-rail-item>
+      </mdui-navigation-rail-item>-->
     </mdui-navigation-rail>
     <mdui-layout-main>
       <router-view :key="key" v-slot="{ Component }">

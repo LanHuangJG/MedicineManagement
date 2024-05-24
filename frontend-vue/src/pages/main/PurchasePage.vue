@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {useStorage} from "@vueuse/core";
 import axios from "axios";
+import {ElMessage} from "element-plus";
 
 
 interface Type {
@@ -71,10 +72,51 @@ const refresh = (page: number, size: number = 10) => {
 const handleCurrentChange = (val: number) => {
   refresh(val)
 }
+const dialogAddVisible = ref(false)
+const formLabelWidth = '140px'
+const restockMedicineForm = reactive({
+  rid: "",
+  count: ""
+})
+const purchase = () => {
+  const token = useStorage('token', "")
+  axios.post("/api/trade/purchase", restockMedicineForm, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      refresh(currentPage.value)
+      ElMessage.success("购买成功")
+    } else {
+      ElMessage.error("购买失败")
+    }
+  })
+}
 </script>
 
 <template>
   <div>
+    <el-dialog v-model="dialogAddVisible" align-center title="药品购买" width="500">
+      <el-form :model="restockMedicineForm">
+        <el-form-item :label-width="formLabelWidth" label="进货订单id">
+          <el-input v-model="restockMedicineForm.rid" autocomplete="off" clearable placeholder="请输入进货订单id"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="购买数目">
+          <el-input v-model="restockMedicineForm.count" autocomplete="off" clearable placeholder="请输入购买数目"/>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogAddVisible = false">取消</el-button>
+          <el-button type="primary" @click="dialogAddVisible = false;purchase()">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+
     <div style="display: flex;flex-direction: column;width: 100%">
       <div style="display: flex;width: 100%">
         <div class="mdui-prose">
@@ -83,12 +125,16 @@ const handleCurrentChange = (val: number) => {
           </h2>
         </div>
         <div style="flex: 1"/>
-        <mdui-button icon="refresh" style="margin-right: 8px;margin-bottom: 16px" variant="tonal" @click="refresh(currentPage)">
+        <mdui-button icon="add_shopping_cart--two-tone" style="margin-right: 16px;margin-bottom: 16px" variant="filled"
+                     @click="dialogAddVisible=true">购买药品
+        </mdui-button>
+        <mdui-button icon="refresh--two-tone" style="margin-right: 8px;margin-bottom: 16px" variant="tonal"
+                     @click="refresh(currentPage)">
           刷新
         </mdui-button>
       </div>
       <el-table :data="purchaseList" border stripe style="width: 100%">
-        <el-table-column label="订单id" prop="id" width="90"/>
+        <el-table-column label="购买订单id" prop="id" width="100"/>
         <el-table-column label="药品图片" prop="medicine" width="100">
           <template v-slot="scope">
             <el-image :src="scope.row.medicine.image" fit="cover" loading="lazy"/>

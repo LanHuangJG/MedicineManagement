@@ -3,7 +3,7 @@
     <el-dialog v-model="dialogAddVisible" align-center title="药品进货" width="500">
       <el-form :model="restockMedicineForm">
         <el-form-item :label-width="formLabelWidth" label="药品id">
-          <el-input v-model="restockMedicineForm.id" autocomplete="off" clearable placeholder="请输入药品图片id"/>
+          <el-input v-model="restockMedicineForm.id" autocomplete="off" clearable placeholder="请输入药品id"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="进货数目">
           <el-input v-model="restockMedicineForm.count" autocomplete="off" clearable placeholder="请输入进货数目"/>
@@ -34,10 +34,10 @@
         <mdui-button icon="input--two-tone" style="margin-right: 16px;margin-bottom: 16px" variant="filled"
                      @click="dialogAddVisible=true">进货
         </mdui-button>
-        <mdui-button icon="refresh" style="margin-right: 8px;margin-bottom: 16px" variant="tonal">刷新</mdui-button>
+        <mdui-button icon="refresh--two-tone" style="margin-right: 8px;margin-bottom: 16px" variant="tonal">刷新</mdui-button>
       </div>
       <el-table :data="restockList" border stripe style="width: 100%">
-        <el-table-column label="订单id" prop="id" width="90"/>
+        <el-table-column label="进货订单id" prop="id" width="100"/>
         <el-table-column label="药品图片" prop="medicine" width="100">
           <template v-slot="scope">
             <el-image :src="scope.row.medicine.image" fit="cover" loading="lazy"/>

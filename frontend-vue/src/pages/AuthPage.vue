@@ -5,7 +5,7 @@
 <template>
   <mdui-layout full-height>
     <mdui-top-app-bar>
-      <mdui-button-icon icon="medical_services--two-tone"></mdui-button-icon>
+      <mdui-button-icon icon="medical_services--two-tone" style="margin-left: 12px"></mdui-button-icon>
       <mdui-top-app-bar-title>
         药品管理系统
       </mdui-top-app-bar-title>

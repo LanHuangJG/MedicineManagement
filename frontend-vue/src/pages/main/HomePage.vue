@@ -1,18 +1,22 @@
 <template>
   <div>
     <mdui-card style="width: 100%;display: flex;margin-bottom: 16px;flex-direction: column">
-      <div class="mdui-prose" style="margin: 16px;width: 100%">
-        <div style="display: flex">
-          <h2>{{ getGreeting() }}&nbsp;&nbsp;&nbsp;</h2>
-          <h2 style="font-weight: bold">{{ username }}</h2>
+      <div style="display: flex;justify-content: center;align-items: center">
+        <div class="mdui-prose" style="margin: 16px;width: 100%">
+          <div style="display: flex">
+            <h2>{{ getGreeting() }}&nbsp;&nbsp;&nbsp;</h2>
+            <h2 style="font-weight: bold">{{ username }}</h2>
+          </div>
+          <h1>
+            欢迎您使用药品管理系统
+          </h1>
         </div>
-        <h1>
-          欢迎您使用药品管理系统
-        </h1>
+        <mdui-icon name='auto_awesome--two-tone' style="margin: 64px;font-size: 56px"></mdui-icon>
       </div>
     </mdui-card>
     <mdui-card style="width: 100%;display: flex" variant="outlined">
-      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated" @click="router.replace('/medicineManage')">
+      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"
+                 @click="router.replace('/medicineManage')">
         <mdui-icon name='medical_services--two-tone' style="margin: 16px"></mdui-icon>
         <div style="display: flex;justify-items: center;align-items: center;justify-content: space-between">
           <div class="mdui-prose" style="margin-left: 16px">
@@ -21,7 +25,8 @@
           <count-up :end-val="medicineCount" style="margin-right: 16px;font-size: large"></count-up>
         </div>
       </mdui-card>
-      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"  @click="router.replace('/bigType')">
+      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"
+                 @click="router.replace('/bigType')">
         <mdui-icon name='medication_liquid--two-tone' style="margin: 16px"></mdui-icon>
         <div style="display: flex;justify-items: center;align-items: center;justify-content: space-between">
           <div class="mdui-prose" style="margin-left: 16px">
@@ -30,7 +35,8 @@
           <count-up :end-val="bigTypeCount" style="margin-right: 16px;font-size: large"></count-up>
         </div>
       </mdui-card>
-      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated" @click="router.replace('/type')">
+      <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"
+                 @click="router.replace('/type')">
         <mdui-icon name='animation--two-tone' style="margin: 16px"></mdui-icon>
         <div style="display: flex;justify-items: center;align-items: center;justify-content: space-between">
           <div class="mdui-prose" style="margin-left: 16px">
@@ -65,9 +71,9 @@ import {useStorage} from "@vueuse/core";
 import axios from "axios";
 import VChart from 'vue-echarts';
 import {useRouter} from "vue-router";
-import "echarts";
+
 const router = useRouter()
-const username  =
+const username =
     useStorage('username', "")
 const medicineCount = ref(0)
 const bigTypeCount = ref(0)

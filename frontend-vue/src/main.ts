@@ -10,6 +10,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import {setColorScheme} from "mdui"
 import "default-passive-events"
+import "echarts";
 import VueCountdown from '@chenfengyuan/vue-countdown';
 const app = createApp(App)
 const pinia = createPinia()

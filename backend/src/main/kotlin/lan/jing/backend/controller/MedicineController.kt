@@ -5,6 +5,7 @@ import com.mybatisflex.kotlin.extensions.db.all
 import com.mybatisflex.kotlin.extensions.db.filterOne
 import com.mybatisflex.kotlin.extensions.db.insert
 import com.mybatisflex.kotlin.extensions.kproperty.eq
+import com.mybatisflex.kotlin.extensions.kproperty.like
 import lan.jing.backend.entity.Medicine
 import lan.jing.backend.entity.MedicineBigType
 import lan.jing.backend.entity.MedicineType
@@ -67,6 +68,22 @@ class MedicineController {
     @GetMapping("/list")
     fun list(@RequestParam page: Int, @RequestParam size: Int): ListResponse {
         val query = medicineMapper.paginateWithRelations(page, size, QueryWrapper.create())
+        val list = query.records
+        return ListResponse(
+            code = "200",
+            message = "获取成功",
+            list = list,
+            totalSize = query.totalPage.toString()
+        )
+    }
+
+    @GetMapping("/searchMedicine")
+    fun searchMedicine(@RequestParam keyword: String, @RequestParam page: Int, @RequestParam size: Int): ListResponse {
+        val query = medicineMapper.paginateWithRelations(
+            page, size, QueryWrapper()
+                .select()
+                .where(Medicine::name like "%$keyword%")
+        )
         val list = query.records
         return ListResponse(
             code = "200",
@@ -192,9 +209,11 @@ class MedicineController {
         val code: String,
         val message: String
     )
+
     data class DeleteMedicineRequest(
         val id: Long
     )
+
     @PostMapping("/deleteMedicine")
     fun deleteMedicine(@RequestBody deleteMedicineRequest: DeleteMedicineRequest): DeleteMedicineResponse {
         if (deleteMedicineRequest.id < 2276) return DeleteMedicineResponse("400", "删除失败,保留药品不能被删除")
