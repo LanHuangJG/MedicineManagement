@@ -96,6 +96,33 @@ class TradeController {
         }
     }
 
+    data class RestockEditRequest(
+        val id: Long,
+        val count: Int,
+        val price: Double
+    )
+
+    data class RestockEditResponse(
+        val code: String,
+        val message: String
+    )
+
+
+    @PostMapping("/editRestock")
+    fun editRestock(
+        @RequestBody restockEditRequest: RestockEditRequest
+    ): RestockEditResponse {
+        restockMapper.update(
+            MedicineRestock(
+                id = restockEditRequest.id,
+                count = restockEditRequest.count,
+                price = restockEditRequest.price
+            )
+        )
+        return RestockEditResponse("200", "进货成功")
+    }
+
+
     data class ListPurchaseResponse(
         val code: String,
         val message: String,
@@ -132,5 +159,19 @@ class TradeController {
             list = list,
             totalSize = query.totalPage.toString()
         )
+    }
+
+    data class DeletePurchaseRequest(
+        val id: Long
+    )
+
+    @PostMapping("/deleteRestock")
+    fun deleteRestock(@RequestBody deletePurchaseRequest: DeletePurchaseRequest): RestockResponse {
+        try {
+            restockMapper.deleteById(deletePurchaseRequest.id)
+        } catch (e: Exception) {
+            return RestockResponse("400", "删除失败")
+        }
+        return RestockResponse("200", "删除成功")
     }
 }

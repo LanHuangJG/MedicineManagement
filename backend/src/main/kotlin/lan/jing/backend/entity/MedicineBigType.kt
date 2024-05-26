@@ -12,7 +12,15 @@ data class MedicineBigType(
     var name: String? = "",
     @RelationOneToMany(selfField = "id", targetField = "bid")
     var types: List<MedicineType>? = null
+)
 
+@Table("medicine_big_type")
+data class MedicineBigTypeWithMedicines(
+    @Id(keyType = KeyType.Auto)
+    var id: Long? = null,
+    var name: String? = "",
+    @RelationOneToMany(selfField = "id", targetField = "bid")
+    var medicines: List<Medicine>? = null
 )
 
 @Table("medicine_big_type")

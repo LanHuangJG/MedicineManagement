@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {useStorage} from "@vueuse/core";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import axios from "axios";
 import {useRoute, useRouter} from "vue-router";
 import {ElNotification} from "element-plus";
@@ -75,9 +75,10 @@ const bigTypeIcon = computed(() => {
 const typeIcon = computed(() => {
   return route.path === "/type" ? "dataset--two-tone" : "dataset--outlined"
 })
-const mockIcon = computed(() => {
-  return route.path === "/mock" ? "spa--two-tone" : "spa--outlined"
+const userManageIcon = computed(() => {
+  return route.path === "/userManage" ? "people--two-tone" : "people--outlined"
 })
+
 function showUserInfoDialog() {
   dialog({
     headline: "用户信息",
@@ -90,10 +91,39 @@ function showUserInfoDialog() {
   });
 }
 
+const editUserInfoDialogShow = ref(false)
+const formLabelWidth = '140px'
+const form = reactive({
+  username: username.value,
+  originalPassword: "",
+  password: "",
+})
+
 </script>
 
 <template>
   <mdui-layout full-height>
+    <el-dialog v-model="editUserInfoDialogShow" align-center title="修改用户信息" width="500">
+      <el-form :model="form">
+        <el-form-item :label-width="formLabelWidth" label="用户名">
+          <el-input v-model="form.username" autocomplete="off" clearable/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="原密码">
+          <el-input v-model="form.originalPassword" autocomplete="off" clearable type="password"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="密码">
+          <el-input v-model="form.password" autocomplete="off" clearable type="password"/>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="editUserInfoDialogShow = false">取消</el-button>
+          <el-button type="primary" @click="editUserInfoDialogShow = false">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
     <mdui-top-app-bar>
       <mdui-button-icon icon="medical_services--two-tone" style="margin-left: 12px"></mdui-button-icon>
       <mdui-top-app-bar-title>
@@ -104,16 +134,19 @@ function showUserInfoDialog() {
         <mdui-avatar slot="trigger" style="flex-shrink: 0">{{ username[0].toUpperCase() }}</mdui-avatar>
         <mdui-menu>
           <mdui-menu-item @click="showUserInfoDialog">个人信息
-            <mdui-icon slot="icon" name="people"></mdui-icon>
+            <mdui-icon slot="icon" name="people--two-tone"></mdui-icon>
+          </mdui-menu-item>
+          <mdui-menu-item @click="editUserInfoDialogShow=true">修改信息
+            <mdui-icon slot="icon" name="edit--two-tone"></mdui-icon>
           </mdui-menu-item>
           <mdui-menu-item @click="logout">退出登录
-            <mdui-icon slot="icon" name="logout"></mdui-icon>
+            <mdui-icon slot="icon" name="logout--two-tone"></mdui-icon>
           </mdui-menu-item>
         </mdui-menu>
       </mdui-dropdown>
     </mdui-top-app-bar>
     <mdui-navigation-rail :value="route.path">
-      <mdui-button-icon icon="settings--two-tone" slot="bottom"></mdui-button-icon>
+      <mdui-button-icon slot="bottom" icon="settings--two-tone"></mdui-button-icon>
       <mdui-navigation-rail-item :icon="homeIcon" value="/" @click="router.replace('/')">主页
       </mdui-navigation-rail-item>
       <mdui-navigation-rail-item :icon="medicineManageIcon" value="/medicineManage"
@@ -132,9 +165,9 @@ function showUserInfoDialog() {
       <mdui-navigation-rail-item :icon="saleIcon" value="/sale" @click="router.replace('/sale')">
         销售记录
       </mdui-navigation-rail-item>
-<!--      <mdui-navigation-rail-item :icon="mockIcon" value="/mock" @click="router.replace('/mock')">
-        模拟购买
-      </mdui-navigation-rail-item>-->
+      <mdui-navigation-rail-item :icon="userManageIcon" value="/userManage" @click="router.replace('/userManage')">
+        用户管理
+      </mdui-navigation-rail-item>
     </mdui-navigation-rail>
     <mdui-layout-main>
       <router-view :key="key" v-slot="{ Component }">

@@ -5,9 +5,9 @@
         <div class="mdui-prose" style="margin: 16px;width: 100%">
           <div style="display: flex">
             <h2>{{ getGreeting() }}&nbsp;&nbsp;&nbsp;</h2>
-            <h2 style="font-weight: bold">{{ username }}</h2>
+            <h2 style="font-weight: bolder">{{ username }}</h2>
           </div>
-          <h1>
+          <h1 style="font-family: 华文楷体,serif;font-weight: bold">
             欢迎您使用药品管理系统
           </h1>
         </div>

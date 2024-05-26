@@ -4,6 +4,7 @@ import {useStorage} from "@vueuse/core";
 import axios from "axios";
 import {Delete, Edit, View} from "@element-plus/icons-vue";
 import VChart from "vue-echarts";
+
 interface Medicine {
   id: number,
   name: string,
@@ -96,10 +97,74 @@ const type = ref({
     }
   ]
 });
+const option = {
+  textStyle: {
+    fontFamily: 'Inter, "Helvetica Neue", Arial, sans-serif',
+  },
+  title: {
+    text: 'Traffic Sources',
+    left: 'center',
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b} : {c} ({d}%)',
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left',
+    data: [
+      'Direct',
+      'Email',
+      'Ad Networks',
+      'Video Ads',
+      'Search Engines',
+    ],
+  },
+  series: [
+    {
+      name: 'Traffic Sources',
+      type: 'pie',
+      radius: '55%',
+      center: ['50%', '60%'],
+      data: [
+        {value: 335, name: 'Direct'},
+        {value: 310, name: 'Email'},
+        {value: 234, name: 'Ad Networks'},
+        {value: 135, name: 'Video Ads'},
+        {value: 1548, name: 'Search Engines'},
+      ],
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+  ],
+}
+const dialogDeleteVisible = ref(false)
 </script>
 
 <template>
   <div>
+    <el-dialog
+        v-model="dialogDeleteVisible"
+        align-center
+        title="警告"
+        width="500"
+    >
+      <span>确认删除此药品吗，此操作将无法恢复 !!!</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogDeleteVisible = false">取消</el-button>
+          <el-button type="danger" @click="dialogDeleteVisible = false">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <div style="display: flex;flex-direction: column;width: 100%">
       <div style="display: flex;width: 100%">
         <div class="mdui-prose">
@@ -114,7 +179,7 @@ const type = ref({
       </div>
     </div>
     <transition>
-      <el-table :data="types" border stripe style="width: 100%" v-show="dataType==='table'">
+      <el-table v-show="dataType==='table'" :data="types" border stripe style="width: 100%">
         <el-table-column label="种类id" prop="id" width="120"/>
         <el-table-column label="药品种类" prop="name" width="120"/>
         <el-table-column label="药品数量" prop="medicines">
@@ -132,7 +197,7 @@ const type = ref({
             <el-button :icon="Edit" type="warning">
               编辑
             </el-button>
-            <el-button :icon="Delete" type="danger">删除</el-button>
+            <el-button :icon="Delete" type="danger" @click="dialogDeleteVisible=true">删除</el-button>
           </div>
         </el-table-column>
       </el-table>
@@ -164,10 +229,8 @@ const type = ref({
                      layout="prev, pager, next"
                      style="margin: 16px"
                      @current-change="handleCurrentChange"/>
-    </div>
-    <transition>
-      <v-chart v-show="dataType==='chart'" :option="type" autoresize :initOption="initOption" class="chart"/>
-    </transition>
+    </div
+    <v-chart :option="option" autoresize/>
   </div>
 </template>
 
