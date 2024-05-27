@@ -246,8 +246,8 @@ class TradeController {
     data class ResStockCountByDayResponse(
         val code: String,
         val message: String,
-        val counts: List<Int>,
-        val days: List<String>
+        val counts: List<Int?>,
+        val days: List<String?>
     )
 
     @GetMapping("/restockCountByDay")
