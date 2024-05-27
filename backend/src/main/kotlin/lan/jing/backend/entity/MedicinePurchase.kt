@@ -1,7 +1,7 @@
 package lan.jing.backend.entity
 
 import com.mybatisflex.annotation.*
-import java.util.Date
+import java.time.LocalDateTime
 
 @Table("purchase")
 data class MedicinePurchase(
@@ -12,7 +12,7 @@ data class MedicinePurchase(
     var rid: Long? = null,
     var count: Int? = null,
     var price: Double? = null,
-    var time:Date? = null,
+    var time: LocalDateTime? = null,
     @RelationOneToOne(selfField = "mid", targetField = "id")
     var medicine: Medicine? = null,
     @RelationOneToOne(selfField = "uid", targetField = "id")

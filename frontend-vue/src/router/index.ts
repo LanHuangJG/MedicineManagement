@@ -30,8 +30,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("../pages/main/TypePage.vue")
             }
             , {
-                path: "/mock",
-                component: () => import("../pages/main/MockPurchasePage.vue")
+                path: "/userManage",
+                component: () => import("../pages/main/UserManagePage.vue")
             }
         ]
     },

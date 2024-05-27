@@ -3,7 +3,7 @@ import {onMounted, reactive, ref, watch} from "vue";
 import {useStorage} from "@vueuse/core";
 import axios from "axios";
 import {ElMessage} from "element-plus";
-import {Delete, Edit,Search} from "@element-plus/icons-vue";
+import {Delete, Edit, Search} from "@element-plus/icons-vue";
 
 onMounted(() => {
   const token =
@@ -53,7 +53,7 @@ const bigTypes = ref<BigType[]>([])
 
 const handleCurrentChange = (page: number) => {
   if (isSearchMode.value) {
-    search(page)
+    search(page, false)
   } else {
     getMedicineList(page)
   }
@@ -200,7 +200,7 @@ const deleteMedicine = () => {
 }
 const isSearchMode = ref(false)
 const searchWord = ref('')
-const search = (page: number = 1) => {
+const search = (page: number = 1, isSearch: boolean) => {
   const token = useStorage('token', "")
   isSearchMode.value = true
   axios.get(`/api/medicine/searchMedicine?keyword=${searchWord.value}&page=${page}&size=10`, {
@@ -209,10 +209,11 @@ const search = (page: number = 1) => {
     }
   }).then(res => {
     if (res.data.code === "200") {
-      ElMessage({
-        message: '搜索成功',
-        type: 'success',
-      });
+      if (isSearch)
+        ElMessage({
+          message: '搜索成功',
+          type: 'success',
+        });
       medicines.value = res.data.list.map((item: medicine) => {
         return {
           id: item.id,
@@ -280,7 +281,7 @@ function getMedicineList(page: number, size: number = 10) {
 </script>
 
 <template>
-  <div>
+  <el-scrollbar height="100%">
     <!-- 添加药品弹窗   -->
 
     <el-dialog v-model="dialogAddVisible" align-center title="添加药品" width="500">
@@ -553,14 +554,14 @@ function getMedicineList(page: number, size: number = 10) {
           </template>
         </el-table-column>
         <el-table-column label="主要成分" prop="mainIngredient" width="180"/>
-        <el-table-column label="主要功效" prop="functionalIndications" width="180">
+        <el-table-column label="主要功效" prop="functionalIndications" width="100">
           <template v-slot="scope">
             {{ scope.row.functionalIndications.replace("...[详情]", "").replace("[详情]", "") }}
           </template>
         </el-table-column>
-        <el-table-column label="使用剂量" prop="dosage" width="180"/>
-        <el-table-column label="生产公司" prop="manufacturer" width="150"/>
-        <el-table-column label="批准文号" prop="approvalNumber" width="150"/>
+        <el-table-column label="使用剂量" prop="dosage" width="100"/>
+        <el-table-column label="生产公司" prop="manufacturer" width="100"/>
+        <el-table-column label="批准文号" prop="approvalNumber" width="100"/>
         <el-table-column fixed="right" label="操作" width="180">
           <template v-slot="scope">
             <div style="width: 100%;display: flex;justify-content: center;align-items: center">
@@ -599,11 +600,13 @@ bigType=scope.row.bigType.name;type=scope.row.type.name">
           <el-input v-model="searchWord" placeholder="请输入您要搜索的药品"
                     style="width: 240px;height: 36px;margin: 16px">
             <template #prefix>
-              <el-icon class="el-input__icon"><Search /></el-icon>
+              <el-icon class="el-input__icon">
+                <Search/>
+              </el-icon>
             </template>
           </el-input>
-          <el-button type="success" plain @click="search()">搜索</el-button>
-          <el-button type="primary" plain @click="currentPage=1;refresh()">重置</el-button>
+          <el-button plain type="success" @click="search(1,false)">搜索</el-button>
+          <el-button plain type="primary" @click="currentPage=1;refresh()">重置</el-button>
         </div>
         <div style="flex: 1"/>
 
@@ -616,7 +619,7 @@ bigType=scope.row.bigType.name;type=scope.row.type.name">
                        @current-change="handleCurrentChange"/>
       </div>
     </div>
-  </div>
+  </el-scrollbar>
 </template>
 
 <style scoped>

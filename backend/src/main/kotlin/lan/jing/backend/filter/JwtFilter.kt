@@ -30,7 +30,7 @@ class JwtFilter : OncePerRequestFilter() {
             }
             if (user != null) {
                 SecurityContextHolder.getContext().authentication =
-                    UsernamePasswordAuthenticationToken(user, null, emptyList())
+                    UsernamePasswordAuthenticationToken(user, token, emptyList())
             }
         }
         filterChain.doFilter(request, response)

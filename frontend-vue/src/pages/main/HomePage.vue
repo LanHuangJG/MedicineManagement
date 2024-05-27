@@ -5,9 +5,9 @@
         <div class="mdui-prose" style="margin: 16px;width: 100%">
           <div style="display: flex">
             <h2>{{ getGreeting() }}&nbsp;&nbsp;&nbsp;</h2>
-            <h2 style="font-weight: bold">{{ username }}</h2>
+            <h2 style="font-weight: bolder">{{ username }}</h2>
           </div>
-          <h1>
+          <h1 style="font-family: 华文楷体,serif;font-weight: bold">
             欢迎您使用药品管理系统
           </h1>
         </div>
@@ -27,7 +27,7 @@
       </mdui-card>
       <mdui-card clickable style="height: 124px;flex: 1;margin: 16px" variant="elevated"
                  @click="router.replace('/bigType')">
-        <mdui-icon name='medication_liquid--two-tone' style="margin: 16px"></mdui-icon>
+        <mdui-icon name='merge_type--two-tone' style="margin: 16px"></mdui-icon>
         <div style="display: flex;justify-items: center;align-items: center;justify-content: space-between">
           <div class="mdui-prose" style="margin-left: 16px">
             <h2>药品分类</h2>

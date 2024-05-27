@@ -3,6 +3,7 @@ import {onMounted, reactive, ref} from "vue";
 import {useStorage} from "@vueuse/core";
 import axios from "axios";
 import {ElMessage} from "element-plus";
+import VChart from "vue-echarts";
 
 
 interface Type {
@@ -76,7 +77,8 @@ const dialogAddVisible = ref(false)
 const formLabelWidth = '140px'
 const restockMedicineForm = reactive({
   rid: "",
-  count: ""
+  count: "",
+  time: ""
 })
 const purchase = () => {
   const token = useStorage('token', "")
@@ -93,6 +95,24 @@ const purchase = () => {
     }
   })
 }
+
+const dataType = ref("table")
+
+const option = {
+  xAxis: {
+    type: 'category',
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      data: [120, 200, 150, 80, 70, 110, 130],
+      type: 'bar'
+    }
+  ]
+};
 </script>
 
 <template>
@@ -104,6 +124,16 @@ const purchase = () => {
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="购买数目">
           <el-input v-model="restockMedicineForm.count" autocomplete="off" clearable placeholder="请输入购买数目"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="药品购买日期">
+          <el-date-picker
+              v-model="restockMedicineForm.time"
+              type="date"
+              placeholder="请选择药品购买日期"
+              style="width: 100%"
+              format="YYYY/MM/DD"
+              value-format="YYYY-MM-DD"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -133,7 +163,29 @@ const purchase = () => {
           刷新
         </mdui-button>
       </div>
-      <el-table :data="purchaseList" border stripe style="width: 100%">
+      <div style="display: flex">
+        <mdui-segmented-button-group :value="dataType" selects="single" style="margin: 0 0 16px 0">
+          <mdui-segmented-button icon="table_chart--two-tone" selected-icon="table_chart--two-tone" value="table"
+                                 @click="dataType='table'">表格
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="pie_chart--two-tone" selected-icon="pie_chart--two-tone" value="chart"
+                                 @click="dataType='chart'">图表
+          </mdui-segmented-button>
+        </mdui-segmented-button-group>
+        <div style="flex: 1"/>
+        <mdui-segmented-button-group :value="dataType" selects="single" style="margin: 0 8px 16px 0" v-if="dataType==='chart'">
+          <mdui-segmented-button icon="today--two-tone" selected-icon="today--two-tone" value="table"
+                                 @click="dataType='table'">近七日
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="calendar_month--two-tone" selected-icon="calendar_month--two-tone" value="chart"
+                                 @click="dataType='chart'">近七月
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="access_time--two-tone" selected-icon="access_time--two-tone" value="chart"
+                                 @click="dataType='chart'">近七年
+          </mdui-segmented-button>
+        </mdui-segmented-button-group>
+      </div>
+      <el-table :data="purchaseList" border stripe style="width: 100%" height="500" v-if="dataType === 'table'">
         <el-table-column label="购买订单id" prop="id" width="100"/>
         <el-table-column label="药品图片" prop="medicine" width="100">
           <template v-slot="scope">
@@ -171,10 +223,16 @@ const purchase = () => {
           <rect data-v-6a29f87a="" fill="url(#a)" height="100%" width="100%"></rect>
         </svg>
       </div>
+      <div v-if="dataType==='chart'" style="width: 100%;height:500px">
+        <transition>
+          <v-chart :option="option" autoresize/>
+        </transition>
+      </div>
       <div style="width: 100%;display: flex;justify-content: center">
         <div style="flex: 1"/>
         <el-pagination v-model:current-page="currentPage" :page-count="totalPage" background layout="prev, pager, next"
                        style="margin: 16px"
+                       v-if="dataType === 'table'"
                        @current-change="handleCurrentChange"/>
       </div>
     </div>

@@ -6,16 +6,86 @@
           <el-input v-model="restockMedicineForm.id" autocomplete="off" clearable placeholder="请输入药品id"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="进货数目">
-          <el-input v-model="restockMedicineForm.count" autocomplete="off" clearable placeholder="请输入进货数目"/>
+          <el-input-number v-model="restockMedicineForm.count" autocomplete="off" clearable placeholder="请输入进货数目"
+                           style="width: 100%"/>
+
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="药品单价">
-          <el-input v-model="restockMedicineForm.price" autocomplete="off" clearable placeholder="请输入药品单价"/>
+        <el-form-item :label-width="formLabelWidth" label="药品进货单价">
+          <el-input v-model="restockMedicineForm.outPrice" autocomplete="off" clearable
+                    placeholder="请输入药品进货单价"/>
+        </el-form-item>
+
+        <el-form-item :label-width="formLabelWidth" label="药品售出单价">
+          <el-input v-model="restockMedicineForm.price" autocomplete="off" clearable placeholder="请输入药品售出单价"/>
+        </el-form-item>
+
+        <el-form-item :label-width="formLabelWidth" label="药品进货日期">
+          <el-date-picker
+              v-model="restockMedicineForm.restockDate"
+              format="YYYY/MM/DD"
+              placeholder="请选择药品进货日期"
+              style="width: 100%"
+              type="date"
+              value-format="YYYY-MM-DD"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogAddVisible = false">取消</el-button>
           <el-button type="primary" @click="dialogAddVisible = false;restock()">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="editDialogVisible" align-center title="进货编辑" width="500">
+      <el-form :model="editForm">
+        <el-form-item :label-width="formLabelWidth" label="进货药品id">
+          <el-input v-model="editForm.id" autocomplete="off" clearable disabled placeholder="请输入药品id"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="药品数目">
+          <el-input-number v-model="editForm.count" autocomplete="off" clearable placeholder="请输入进货数目"
+                           style="width: 100%"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="药品售出单价">
+          <el-input v-model="editForm.price" autocomplete="off" clearable placeholder="请输入药品售出单价"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="药品进货日期">
+          <el-date-picker
+              v-model="editForm.restockDate"
+              format="YYYY/MM/DD"
+              placeholder="请选择药品进货日期"
+              style="width: 100%"
+              type="date"
+              value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="editDialogVisible = false;editRestock()">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+
+    <!--    删除药品    -->
+    <el-dialog
+        v-model="dialogDeleteVisible"
+        align-center
+        title="警告"
+        width="500"
+    >
+      <span>确认删除此药品吗，此操作将无法恢复 !!!</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogDeleteVisible = false">取消</el-button>
+          <el-button type="danger" @click="dialogDeleteVisible = false;deleteStock()">
             确定
           </el-button>
         </div>
@@ -34,9 +104,20 @@
         <mdui-button icon="input--two-tone" style="margin-right: 16px;margin-bottom: 16px" variant="filled"
                      @click="dialogAddVisible=true">进货
         </mdui-button>
-        <mdui-button icon="refresh--two-tone" style="margin-right: 8px;margin-bottom: 16px" variant="tonal">刷新</mdui-button>
+        <mdui-button icon="refresh--two-tone" style="margin-right: 8px;margin-bottom: 16px" variant="tonal">刷新
+        </mdui-button>
       </div>
-      <el-table :data="restockList" border stripe style="width: 100%">
+      <div style="display: flex">
+        <mdui-segmented-button-group :value="dataType" selects="single" style="margin: 0 0 16px 0">
+          <mdui-segmented-button icon="table_chart--two-tone" selected-icon="table_chart--two-tone" value="table"
+                                 @click="dataType='table'">表格
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="pie_chart--two-tone" selected-icon="pie_chart--two-tone" value="chart"
+                                 @click="dataType='chart'">图表
+          </mdui-segmented-button>
+        </mdui-segmented-button-group>
+      </div>
+      <el-table :data="restockList" border height="500" stripe style="width: 100%" v-if="dataType==='table'">
         <el-table-column label="进货订单id" prop="id" width="100"/>
         <el-table-column label="药品图片" prop="medicine" width="100">
           <template v-slot="scope">
@@ -58,13 +139,24 @@
             {{ scope.row.user.username }}
           </template>
         </el-table-column>
-        <el-table-column label="进货单价" prop="price" width="150"/>
         <el-table-column label="进货时间" prop="time" width="150">
           <template v-slot="scope">
             {{ new Date(scope.row.time).toLocaleDateString() }}
           </template>
         </el-table-column>
-        <el-table-column label="药品数量" prop="count" width="180"/>
+        <el-table-column label="进货数量" prop="count" width="180"/>
+        <el-table-column label="药品数量" prop="presentCount" width="180"/>
+        <el-table-column label="进货价格" prop="price" width="150"/>
+        <el-table-column label="售出单价" prop="outPrice" width="150"/>
+        <el-table-column fixed="right" label="操作" width="180">
+          <template v-slot="scope">
+            <el-button type="warning" @click="editDialogVisible=true;editForm.id=scope.row.id;
+editForm.count= scope.row.presentCount;editForm.price = scope.row.outPrice;editForm.restockDate= scope.row.time
+">编辑
+            </el-button>
+            <el-button type="danger" @click="dialogDeleteVisible=true;deleteId=scope.row.id">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="divider" style="margin-top: 16px">
         <svg aria-hidden="true" data-v-6a29f87a="" fill="none" height="8" width="100%"
@@ -88,6 +180,7 @@
 
         <el-pagination v-model:current-page="currentPage" :page-count="totalPage" background layout="prev, pager, next"
                        style="margin: 16px"
+                       v-if="dataType==='table'"
                        @current-change="handleCurrentChange"/>
       </div>
     </div>
@@ -140,6 +233,8 @@ interface Restock {
   mid: number
   uid: number
   count: number
+  presentCount: number
+  outPrice: number
   price: number
   time: Date
   medicine: Medicine
@@ -155,8 +250,10 @@ const dialogAddVisible = ref(false)
 const formLabelWidth = '140px'
 const restockMedicineForm = reactive({
   id: "",
-  count: "",
+  count: 0,
   price: "",
+  outPrice: "",
+  restockDate: ""
 })
 
 function loadTypes(name: string) {
@@ -197,29 +294,84 @@ const refresh = (page: number, size: number = 10) => {
     if (res.data.code === "200") {
       restockList.value = res.data.list as Restock[]
       totalPage.value = Number(res.data.totalSize)
+
     }
   })
 }
 const handleCurrentChange = (val: number) => {
   refresh(val)
 }
-const restock = ()=>{
+const restock = () => {
   const token = useStorage('token', "")
-  axios.post("/api/trade/restock",{
+  axios.post("/api/trade/restock", {
     mid: restockMedicineForm.id,
     count: restockMedicineForm.count,
-    price: restockMedicineForm.price
-  },{
+    price: restockMedicineForm.price,
+    outPrice: restockMedicineForm.outPrice,
+    time: restockMedicineForm.restockDate
+  }, {
     headers: {
       "Authorization": token.value
     }
-  }).then(res=>{
-    if(res.data.code === "200"){
+  }).then(res => {
+    if (res.data.code === "200") {
       refresh(currentPage.value)
       ElMessage.success(res.data.message)
+    } else {
+      ElMessage.error(res.data.message)
     }
   })
 }
+const editForm = reactive(
+    {
+      id: "",
+      count: "",
+      price: "",
+      restockDate: ""
+    }
+)
+const editRestock = () => {
+  const token = useStorage('token', "")
+  axios.post("/api/trade/editRestock", {
+    id: editForm.id,
+    count: editForm.count,
+    price: editForm.price,
+    time: editForm.restockDate
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      refresh(currentPage.value)
+      ElMessage.success(res.data.message)
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+}
+
+const editDialogVisible = ref(false)
+const deleteStock = () => {
+  const token = useStorage('token', "")
+  axios.post("/api/trade/deleteRestock", {
+    id: deleteId.value
+  }, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      refresh(currentPage.value)
+      ElMessage.success(res.data.message)
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+}
+const deleteId = ref(0)
+const dialogDeleteVisible = ref(false)
+const dataType = ref("table")
 </script>
 
 <style scoped>
