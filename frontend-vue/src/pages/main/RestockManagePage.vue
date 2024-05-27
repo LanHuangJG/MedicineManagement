@@ -113,11 +113,24 @@
                                  @click="dataType='table'">表格
           </mdui-segmented-button>
           <mdui-segmented-button icon="pie_chart--two-tone" selected-icon="pie_chart--two-tone" value="chart"
-                                 @click="dataType='chart'">图表
+                                 @click="dataType='chart';loadDay()">图表
+          </mdui-segmented-button>
+        </mdui-segmented-button-group>
+        <div style="flex: 1"/>
+        <mdui-segmented-button-group v-if="dataType==='chart'" :value="chartType" selects="single"
+                                     style="margin: 0 8px 16px 0">
+          <mdui-segmented-button icon="today--two-tone" selected-icon="today--two-tone" value="day"
+                                 @click="chartType='day';loadDay()">近七日
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="calendar_month--two-tone" selected-icon="calendar_month--two-tone" value="month"
+                                 @click="chartType='month';loadMonth()">近七月
+          </mdui-segmented-button>
+          <mdui-segmented-button icon="access_time--two-tone" selected-icon="access_time--two-tone" value="year"
+                                 @click="chartType='year';loadYear()">近七年
           </mdui-segmented-button>
         </mdui-segmented-button-group>
       </div>
-      <el-table :data="restockList" border height="500" stripe style="width: 100%" v-if="dataType==='table'">
+      <el-table v-if="dataType==='table'" :data="restockList" border height="500" stripe style="width: 100%">
         <el-table-column label="进货订单id" prop="id" width="100"/>
         <el-table-column label="药品图片" prop="medicine" width="100">
           <template v-slot="scope">
@@ -171,6 +184,11 @@ editForm.count= scope.row.presentCount;editForm.price = scope.row.outPrice;editF
           <rect data-v-6a29f87a="" fill="url(#a)" height="100%" width="100%"></rect>
         </svg>
       </div>
+      <div v-if="dataType==='chart'" style="width: 100%;height:500px">
+        <transition>
+          <v-chart :option="option" autoresize/>
+        </transition>
+      </div>
       <div style="width: 100%;display: flex;justify-content: center">
         <div style="flex: 1"/>
 
@@ -178,9 +196,9 @@ editForm.count= scope.row.presentCount;editForm.price = scope.row.outPrice;editF
         <!--  分页组件    -->
 
 
-        <el-pagination v-model:current-page="currentPage" :page-count="totalPage" background layout="prev, pager, next"
+        <el-pagination v-if="dataType==='table'" v-model:current-page="currentPage" :page-count="totalPage" background
+                       layout="prev, pager, next"
                        style="margin: 16px"
-                       v-if="dataType==='table'"
                        @current-change="handleCurrentChange"/>
       </div>
     </div>
@@ -193,6 +211,7 @@ import {useStorage} from "@vueuse/core";
 import {onMounted, reactive, ref, watch} from "vue";
 import axios from "axios";
 import {ElMessage} from "element-plus";
+import VChart from "vue-echarts";
 
 interface Type {
   id: string,
@@ -372,6 +391,58 @@ const deleteStock = () => {
 const deleteId = ref(0)
 const dialogDeleteVisible = ref(false)
 const dataType = ref("table")
+
+const chartType = ref("day")
+
+const option = reactive({
+  xAxis: {
+    type: 'category',
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      data: [120, 200, 150, 80, 70, 110, 130],
+      type: 'bar'
+    }
+  ]
+})
+
+const loadDay = () => {
+  const token = useStorage('token', "")
+  axios.get("/api/trade/restockCountByDay", {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    option.xAxis.data = res.data.days
+    option.series[0].data = res.data.counts
+  })
+}
+const loadMonth = () => {
+  const token = useStorage('token', "")
+  axios.get("/api/trade/restockCountByMonth", {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    option.xAxis.data = res.data.days
+    option.series[0].data = res.data.counts
+  })
+}
+const loadYear = () => {
+  const token = useStorage('token', "")
+  axios.get("/api/trade/restockCountByYear", {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    option.xAxis.data = res.data.days
+    option.series[0].data = res.data.counts
+  })
+}
 </script>
 
 <style scoped>

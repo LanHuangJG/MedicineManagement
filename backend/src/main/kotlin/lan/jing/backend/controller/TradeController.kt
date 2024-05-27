@@ -214,7 +214,7 @@ class TradeController {
             years.add((year - i).toString())
             counts.add(restockMapper.countByYear(year - i))
         }
-        return ResStockCountByYearResponse("200", "获取成功", counts, years)
+        return ResStockCountByYearResponse("200", "获取成功", counts.reversed(), years.reversed())
     }
 
     data class ResStockCountByMonthResponse(
@@ -224,7 +224,7 @@ class TradeController {
         val months: List<String>
     )
 
-    @GetMapping("restockCountByMonth")
+    @GetMapping("/restockCountByMonth")
     fun stockCountByMonth(): ResStockCountByMonthResponse {
         //近七个月
         val months = mutableListOf<String>()
@@ -240,7 +240,7 @@ class TradeController {
                 counts.add(restockMapper.countByMonth(year, month - i + 1))
             }
         }
-        return ResStockCountByMonthResponse("200", "获取成功", counts, months)
+        return ResStockCountByMonthResponse("200", "获取成功", counts.reversed(), months.reversed())
     }
 
     data class ResStockCountByDayResponse(
@@ -250,7 +250,7 @@ class TradeController {
         val days: List<String>
     )
 
-    @GetMapping("restockCountByDay")
+    @GetMapping("/restockCountByDay")
     fun stockCountByDay(): ResStockCountByDayResponse {
         //近七天
         val days = mutableListOf<String>()
@@ -272,6 +272,6 @@ class TradeController {
                 counts.add(restockMapper.countByDay(year, month + 1, day - i))
             }
         }
-        return ResStockCountByDayResponse("200", "获取成功", counts, days)
+        return ResStockCountByDayResponse("200", "获取成功", counts.reversed(), days.reversed())
     }
 }
