@@ -98,7 +98,38 @@ const form = reactive({
   originalPassword: "",
   password: "",
 })
-
+const showInfoDialog=()=>{
+  dialog({
+    headline: "开发者信息",
+    body: "<div style='display:flex;align-items:center;flex-direction: column;gap: 16px'><span style='font-weight: bold;font-size: 16px'>前端开发: 郭志锋</span><span style='font-weight: bold;font-size: 16px'>后端开发: 高佳豪</span><span style='font-weight: bold;font-size: 16px'>数据库设计: 温靖</span></div>",
+    actions: [
+      {
+        text: "确定",
+      }
+    ]
+  });
+}
+const editUserInfo=()=>{
+  axios.post("/api/user/edit", form, {
+    headers: {
+      "Authorization": token.value
+    }
+  }).then(res => {
+    if (res.data.code === "200") {
+      ElNotification({
+        title: '提示',
+        message: res.data.message,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: '提示',
+        message: "修改失败",
+        type: 'error',
+      })
+    }
+  })
+}
 </script>
 
 <template>
@@ -118,7 +149,7 @@ const form = reactive({
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="editUserInfoDialogShow = false">取消</el-button>
-          <el-button type="primary" @click="editUserInfoDialogShow = false">
+          <el-button type="primary" @click="editUserInfoDialogShow = false;editUserInfo()">
             确定
           </el-button>
         </div>
@@ -146,7 +177,7 @@ const form = reactive({
       </mdui-dropdown>
     </mdui-top-app-bar>
     <mdui-navigation-rail :value="route.path">
-      <mdui-button-icon slot="bottom" icon="settings--two-tone"></mdui-button-icon>
+      <mdui-button-icon slot="bottom" icon="info--two-tone" @click="showInfoDialog()"></mdui-button-icon>
       <mdui-navigation-rail-item :icon="homeIcon" value="/" @click="router.replace('/')">主页
       </mdui-navigation-rail-item>
       <mdui-navigation-rail-item :icon="medicineManageIcon" value="/medicineManage"

@@ -12,12 +12,17 @@ import {setColorScheme} from "mdui"
 import "default-passive-events"
 import "echarts";
 import VueCountdown from '@chenfengyuan/vue-countdown';
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+
 const app = createApp(App)
+
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 app.use(router)
-app.use(ElementPlus)
+app.use(ElementPlus, {
+    locale: zhCn,
+})
 app.component(VueCountdown.name, VueCountdown);
 
 setColorScheme('#77cd75')

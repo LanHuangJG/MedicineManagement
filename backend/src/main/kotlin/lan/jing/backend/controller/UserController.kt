@@ -1,9 +1,10 @@
 package lan.jing.backend.controller
 
-import jakarta.annotation.Resource
+import lan.jing.backend.entity.User
 import lan.jing.backend.mapper.UserMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -45,12 +46,9 @@ class UserController {
 
     @GetMapping("/list")
     fun list(): ListResponse {
-        //获取以user:开头的所有key
         val keys = redisTemplate.keys("user:*")
-        println(keys)
         val list = mutableListOf<UserEntry>()
         keys.forEach {
-            println(it)
             val user = userMapper.selectOneById(redisTemplate.opsForValue().get(it)!!.toLong())
             list.add(
                 UserEntry(
@@ -62,5 +60,31 @@ class UserController {
             )
         }
         return ListResponse("200", "获取用户列表成功", list.toList())
+    }
+
+    data class EditRequest(
+        val username: String,
+        val password: String,
+        val originalPassword: String
+    )
+
+    data class EditResponse(
+        val code: String,
+        val message: String
+    )
+
+    @PostMapping("/edit")
+    fun edit(@RequestBody request: EditRequest): EditResponse {
+        val user: User = SecurityContextHolder.getContext().authentication.principal as User
+        if(request.originalPassword.isBlank()&&request.password.isBlank()){
+            userMapper.update(User(id = user.id, username = request.username))
+        }else{
+            if (request.username != user.username || request.originalPassword != user.password) return EditResponse(
+                "400",
+                "修改失败"
+            )
+            userMapper.update(User(id = user.id, username = request.username, password = request.password))
+        }
+        return EditResponse("200", "修改成功")
     }
 }

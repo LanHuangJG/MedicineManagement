@@ -14,7 +14,6 @@ body,html,#app{
 .fade-leave-to {
     opacity: 0;
 }
-/*
 ::-webkit-scrollbar-track {
     border-radius: 16px;
     background-color: #e7e7e7;
@@ -27,4 +26,4 @@ body,html,#app{
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-}*/
+}

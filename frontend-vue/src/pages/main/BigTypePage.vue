@@ -321,8 +321,16 @@ const editBigType = (id: number = currentEditBigTypeId.value) => {
         </mdui-button>
       </div>
     </div>
+    <mdui-segmented-button-group :value="dataType" selects="single" style="margin: 0 0 16px 0">
+      <mdui-segmented-button icon="table_chart--two-tone" selected-icon="table_chart--two-tone" value="table"
+                             @click="dataType='table'">表格
+      </mdui-segmented-button>
+      <mdui-segmented-button icon="pie_chart--two-tone" selected-icon="pie_chart--two-tone" value="chart"
+                             @click="dataType='chart'">图表
+      </mdui-segmented-button>
+    </mdui-segmented-button-group>
     <Transition>
-      <el-table v-show="dataType==='table'" :data="bigTypes" border stripe style="width: 100%">
+      <el-table v-show="dataType==='table'" :data="bigTypes" border stripe style="width: 100%" height="500">
         <el-table-column label="分类id" prop="id" width="120"/>
         <el-table-column label="药品分类" prop="name" width="120"/>
         <el-table-column label="药品种类" prop="types">
@@ -338,7 +346,7 @@ const editBigType = (id: number = currentEditBigTypeId.value) => {
                 查看
               </el-button>
               <el-button :icon="Edit" type="warning"
-                         @click="currentEditBigTypeId=scope.row.id;form.name=scope.row.name;editBigTypeDialogVisible=true">
+                         @click="currentEditBigTypeId=scope.row.id;form.name=scope.row.name;showMedicinesInBigType(1,10)">
                 编辑
               </el-button>
               <el-button :icon="Delete" type="danger" @click="currentDeleteBigTypeId=scope.row.id
@@ -349,7 +357,7 @@ const editBigType = (id: number = currentEditBigTypeId.value) => {
         </el-table-column>
       </el-table>
     </Transition>
-    <div class="divider" style="margin-top: 16px">
+    <div class="divider" style="margin: 16px">
       <svg aria-hidden="true" data-v-6a29f87a="" fill="none" height="8" width="100%"
            xmlns="http://www.w3.org/2000/svg">
         <pattern id="a" data-v-6a29f87a="" height="8" patternUnits="userSpaceOnUse" width="91">
@@ -363,23 +371,17 @@ const editBigType = (id: number = currentEditBigTypeId.value) => {
       </svg>
     </div>
     <div style="width: 100%;display: flex;justify-content: center">
-      <mdui-segmented-button-group :value="dataType" selects="single" style="margin: 16px">
-        <mdui-segmented-button icon="table_chart--two-tone" selected-icon="table_chart--two-tone" value="table"
-                               @click="dataType='table'">表格
-        </mdui-segmented-button>
-        <mdui-segmented-button icon="pie_chart--two-tone" selected-icon="pie_chart--two-tone" value="chart"
-                               @click="dataType='chart'">图表
-        </mdui-segmented-button>
-      </mdui-segmented-button-group>
       <div style="flex: 1"/>
       <el-pagination v-show="dataType==='table'" v-model:current-page="currentPage" :page-count="totalPage" background
                      layout="prev, pager, next"
                      style="margin: 16px"
                      @current-change="handleCurrentChange"/>
     </div>
-    <transition>
-      <v-chart v-if="dataType==='chart'" :option="bigType" autoresize class="chart"/>
-    </transition>
+    <div style="width: 100%;height:500px" v-if="dataType==='chart'">
+      <transition>
+        <v-chart :option="bigType" autoresize/>
+      </transition>
+    </div>
   </div>
 </template>
 

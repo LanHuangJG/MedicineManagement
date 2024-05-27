@@ -160,7 +160,7 @@ class TypeController {
         )
         return mapOf(
             "code" to "200",
-            "message" to "获取药品分类成功",
+            "message" to "获取药品成功",
             "medicines" to medicines.records,
             "totalSize" to medicines.totalPage
         )
@@ -178,6 +178,25 @@ class TypeController {
         return mapOf(
             "code" to "200",
             "message" to "删除成功"
+        )
+    }
+
+    @GetMapping("/getTypeWithMedicines")
+    fun getTypeWithMedicines(
+        @RequestParam id: String,
+        @RequestParam page: Int,
+        @RequestParam size: Int
+    ): Map<String, Any?> {
+        val medicines = medicineMapper.paginateWithRelations(
+            page,
+            size,
+            QueryWrapper.create().select().where(Medicine::tid eq id.toLong())
+        )
+        return mapOf(
+            "code" to "200",
+            "message" to "获取药品成功",
+            "medicines" to medicines.records,
+            "totalSize" to medicines.totalPage
         )
     }
 }
